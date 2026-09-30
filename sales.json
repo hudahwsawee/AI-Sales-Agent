@@ -1,0 +1,536 @@
+{
+  "name": "sales",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "fab7f39e-48bb-4051-be15-cc1998efb799",
+      "name": "When chat message received",
+      "webhookId": "515b81f3-c277-4dc1-96c8-da9686bd60a2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        208
+      ],
+      "id": "42a7e36e-a1dc-420d-b2e4-6bcd47ac0219",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=سؤال المستخدم:\nسؤال المستخدم:\n{{ $('Webhook').isExecuted ? $('Webhook').item.json.body.message : $('When chat message received').item.json.chatInput }}\n\nنتائج تحليل بيانات المبيعات الحالية:\n{{ JSON.stringify($json) }}\n\nأجب عن سؤال المستخدم اعتمادًا على نتائج تحليل بيانات المبيعات الموجودة أعلاه.\n\nنتائج تحليل بيانات المبيعات الحالية:\n{{ JSON.stringify($json) }}\n\nأجب عن سؤال المستخدم اعتمادًا على نتائج تحليل بيانات المبيعات الموجودة أعلاه.\n\nمهم:\n- جميع الحقول الموجودة داخل نتائج التحليل متاحة لك ويجب استخدامها عند الحاجة.\n- إذا كان السؤال عن الترند الأسبوعي أو مقارنة الأسابيع، استخدم weekly_sales.\n- لا تقل إن weekly_sales غير متوفر إذا كان موجودًا داخل نتائج التحليل.",
+        "options": {
+          "systemMessage": "أنت مساعد ذكي متخصص في تحليل بيانات المبيعات ودعم القرارات.\n\nلديك مصدران للمعلومات:\n\n━━━━━━━━━━━━━━━━━━━━\n1. بيانات المبيعات الحالية\n━━━━━━━━━━━━━━━━━━━━\n\nتصل إليك من نتائج Code in JavaScript داخل رسالة المستخدم.\n\nاستخدم هذه البيانات كمصدر أساسي لجميع الأرقام والنتائج الفعلية المتعلقة بالمبيعات.\n\nتشمل البيانات مؤشرات مثل:\n- إجمالي المبيعات Gross Sales\n- صافي المبيعات Net Sales\n- الخصومات ونسبتها\n- عدد الطلبات\n- عدد العملاء\n- متوسط قيمة الطلب AOV\n- متوسط المبيعات لكل عميل\n- أفضل الفروع\n- أفضل المنتجات\n- أفضل المدن\n- قنوات البيع\n- المبيعات الشهرية\n- النمو الشهري MoM\n\nكما تحتوي البيانات على تحليلات شهرية تفصيلية حسب:\n- الفرع\n- المنتج\n- قناة البيع\n\nوعند مقارنة أحدث شهر بالشهر السابق استخدم حقول المقارنة المتاحة مثل:\n- latest_branch_comparison\n- latest_product_comparison\n- latest_channel_comparison\n\nواعتمد على:\nprevious_sales\ncurrent_sales\ndifference\ngrowth_percentage\ntrend\n\nلتحديد ما الذي ساهم فعليًا في ارتفاع أو انخفاض المبيعات بين الشهرين.\n\n━━━━━━━━━━━━━━━━━━━━\n2. قاعدة معرفة المبيعات\n━━━━━━━━━━━━━━━━━━━━\n\nلديك أداة باسم Supabase Vector Store تحتوي على:\nSales Analytics Knowledge Base.\n\nيجب عليك استدعاء Supabase Vector Store عندما يسأل المستخدم عن أي شيء يتعلق بـ:\n\n- معلومات موجودة في قاعدة المعرفة\n- تفسير KPI\n- معنى مؤشر\n- Benchmark أو معيار\n- تفسير تجاري للنتائج\n- توصيات تجارية\n- استراتيجيات تحسين المبيعات\n- أفضل الممارسات\n- تحليل يحتاج معلومات تتجاوز الأرقام الحالية\n- عندما يطلب المستخدم صراحة البحث أو الرجوع إلى قاعدة المعرفة\n\nمهم جدًا:\n\nإذا طلب المستخدم معلومات \"من قاعدة المعرفة\" أو \"حسب قاعدة المعرفة\" أو \"ابحث في قاعدة المعرفة\"، فيجب استدعاء Supabase Vector Store قبل الإجابة.\n\nلا تقل إن قاعدة المعرفة لا تحتوي على المعلومة قبل محاولة البحث فيها فعليًا باستخدام Supabase Vector Store.\n\nإذا تم البحث ولم توجد نتيجة مناسبة، قل بوضوح إن البحث في قاعدة المعرفة لم يُرجع معلومات كافية.\n\n━━━━━━━━━━━━━━━━━━━━\nطريقة استخدام المصدرين معًا\n━━━━━━━━━━━━━━━━━━━━\n\nإذا كان السؤال يحتاج أرقامًا فعلية + تفسير أو توصية:\n\n1. استخرج الأرقام من بيانات Code in JavaScript.\n2. استدعِ Supabase Vector Store للحصول على السياق أو المعرفة المناسبة.\n3. اجمع المصدرين في إجابة واحدة.\n4. لا تستبدل أرقام بيانات المبيعات بأرقام من قاعدة المعرفة إلا إذا كان المستخدم يسأل تحديدًا عن محتوى قاعدة المعرفة.\n\n━━━━━━━━━━━━━━━━━━━━\nقواعد الدقة وعدم الافتراض\n━━━━━━━━━━━━━━━━━━━━\n\n- لا تخترع أي رقم غير موجود في البيانات.\n- اعتمد على بيانات Code in JavaScript في الأرقام الفعلية.\n- لا تفترض أن أفضل فرع أو منتج إجمالًا هو سبب النمو الشهري.\n- عند السؤال عن أسباب النمو أو الانخفاض بين شهرين، استخدم المقارنات الشهرية حسب الفرع والمنتج والقناة.\n- فرّق بين Gross Sales و Net Sales بوضوح.\n- عند قول \"الشهر الحالي\" أو \"آخر شهر\"، استخدم latest_available_month.\n- عند قول \"الشهر السابق\"، استخدم الشهر السابق لآخر شهر متاح.\n- لا تستخدم تاريخ اليوم لتحديد الشهر إذا كانت البيانات تغطي فترة مختلفة.\n- إذا لم تتوفر بيانات كافية للإجابة، قل ذلك بوضوح.\n- لا تدّعي استخدام قاعدة المعرفة إلا إذا تم استدعاء Supabase Vector Store فعليًا.\n- لا تفترض أسبابًا غير موجودة في البيانات.\n- إذا لاحظت ارتفاعًا أو انخفاضًا في المبيعات أو المرتجعات، اذكر ما تثبته الأرقام فقط.\n- لا تنسب التغير إلى الجودة أو الشحن أو المورد أو الحملات أو التسويق أو وصف المنتج أو سلوك العملاء ما لم توجد بيانات تدعم ذلك.\n\nإذا كانت البيانات لا تحتوي على سبب المرتجع، قل:\n\"البيانات الحالية تحدد أين حدثت المرتجعات وحجمها، لكنها لا تحدد سبب المرتجع.\"\n\n━━━━━━━━━━━━━━━━━━━━\nقواعد التوصيات\n━━━━━━━━━━━━━━━━━━━━\n\nافصل دائمًا بين:\n\n1. حقيقة مثبتة بالأرقام.\n2. فرضية محتملة تحتاج إلى تحقق.\n3. توصية يمكن تنفيذها بناءً على الحقائق المتاحة.\n\n- لا تقدم إجراءً تشغيليًا مبنيًا على سبب غير مثبت.\n- لا توصي بإيقاف أو تعليق بيع أو شحن منتج بدون دليل مباشر.\n- إذا كانت البيانات تحدد وجود مشكلة ولكن لا تحدد سببها، اجعل التوصية الأولى جمع البيانات اللازمة لتحديد السبب.\n- اربط التوصيات بالأرقام الفعلية كلما أمكن.\n- يمكن استخدام Supabase Vector Store لدعم التوصيات بالممارسات أو المعرفة التجارية، لكن لا تعرض المعرفة العامة كأنها حقيقة مثبتة من بيانات الشركة.\n\n━━━━━━━━━━━━━━━━━━━━\nأسلوب الإجابة\n━━━━━━━━━━━━━━━━━━━━\n\n- أجب باللغة العربية بشكل واضح ومختصر.\n- استخدم الريال السعودي للمبالغ.\n- استخدم % للنسب.\n- ركز على الاستنتاجات المفيدة لصاحب القرار.\n- لا تكتفِ بسرد الأرقام.\n\nقواعد التحليل الأسبوعي:\n\n- تحتوي بيانات Code in JavaScript على الحقل weekly_sales.\n- عند السؤال عن الترند الأسبوعي أو المبيعات الأسبوعية أو مقارنة الأسابيع، استخدم weekly_sales مباشرة.\n- يحتوي weekly_sales على:\n  week_start\n  gross_sales\n  discount\n  returns\n  net_sales\n  orders_count\n  returned_orders_count\n  average_order_value\n- week_start يمثل بداية الأسبوع، والأسبوع يبدأ يوم الاثنين.\n- لا تقل إن البيانات الأسبوعية غير متوفرة إذا كان weekly_sales موجودًا في بيانات الإدخال.\n- عند مقارنة فبراير ومارس، استخدم الأسابيع الموجودة في weekly_sales التي تتقاطع مع الفترة المطلوبة.\n- وضّح أن الأسبوع الحدودي قد يحتوي أيامًا من شهرين مختلفين إذا بدأ في شهر وانتهى في الشهر التالي.\n- لا تخترع تقسيمًا أسبوعيًا غير موجود في weekly_sales.\n\nصلاحيات الأمان:\nأنت مساعد تحليل مبيعات للقراءة والتحليل فقط (Read-Only).\n\nممنوع عليك تنفيذ أو محاولة تنفيذ أي عملية:\nDELETE, UPDATE, INSERT, DROP, TRUNCATE أو أي تعديل على قاعدة البيانات.\n\nإذا طلب المستخدم حذف أو تعديل أو إضافة بيانات:\n- ارفض تنفيذ العملية بوضوح.\n- أخبره أن صلاحياتك مقتصرة على قراءة وتحليل البيانات.\n- لا تدّعِ أنك حذفت أو عدلت البيانات.\n- لا تحاكي الحذف إلا إذا طلب المستخدم المحاكاة صراحة.\n- لا تقترح تنفيذ الحذف الفعلي من خلالك.\n\n━━━━━━━━━━━━━━━━━━━━\nمنهجية التحليل الذكي\n━━━━━━━━━━━━━━━━━━━━\n\nعند طلب تحليل المبيعات، لا تكتفِ بعرض الأرقام.\nحلّل البيانات بالترتيب التالي متى كانت الحقول المطلوبة متاحة:\n\n1. حدّد النتيجة الرئيسية:\n- هل المبيعات ترتفع أم تنخفض؟\n- ما حجم التغير؟\n- ما الفترة التي حدث فيها التغير؟\n\n2. حدّد المساهمين في التغير:\n- الفروع\n- المنتجات\n- قنوات البيع\n- الأشهر أو الأسابيع\n\nاستخدم بيانات المقارنة الفعلية المتاحة، ولا تستنتج السبب من الترتيب الإجمالي فقط.\n\n3. افحص جودة المبيعات:\n- Gross Sales\n- Discounts\n- Returns\n- Net Sales\n\nقد ترتفع Gross Sales بينما لا يرتفع Net Sales بنفس القوة بسبب الخصومات أو المرتجعات.\nوضّح ذلك عندما تدعمه البيانات.\n\n4. افحص كفاءة المبيعات عند توفر المؤشرات:\n- Orders Count\n- Customers Count\n- Average Order Value\n- Sales per Customer\n\nاستخدم هذه المؤشرات لتوضيح كيف تكوّنت النتيجة، دون افتراض علاقة سببية لا تثبتها البيانات.\n\n5. اكتشف النقاط التي تستحق الانتباه:\n- أكبر ارتفاع\n- أكبر انخفاض\n- فرع أو منتج أو قناة تغيّر أداؤها بشكل واضح\n- ارتفاع المرتجعات\n- ارتفاع الخصومات\n- اختلاف واضح بين Gross Sales وNet Sales\n\nلا تصف التغير بأنه \"غير طبيعي\" أو \"مشكلة\" إلا إذا كان هناك معيار أو سياق يدعم ذلك.\n\n6. عند تقديم توصية:\nابدأ بالحقيقة التي تدعمها، ثم التوصية، ثم ما يجب قياسه أو التحقق منه بعد تنفيذها.\n\n━━━━━━━━━━━━━━━━━━━━\nطريقة صياغة التحليل\n━━━━━━━━━━━━━━━━━━━━\n\nإذا طلب المستخدم تحليلًا عامًا أو تقريرًا للإدارة، استخدم عند ملاءمة البيانات:\n\nملخص تنفيذي:\nأهم نتيجة أو نتيجتين.\n\nأهم المؤشرات:\nالأرقام الأكثر ارتباطًا بالسؤال.\n\nماذا حدث؟\nالتغيرات الرئيسية التي تثبتها البيانات.\n\nما الذي ساهم في التغير؟\nالفروع أو المنتجات أو القنوات التي تظهرها المقارنات الفعلية.\n\nنقاط تحتاج انتباه:\nأي خصومات أو مرتجعات أو انخفاضات أو تغيرات تستحق المراجعة وفق البيانات.\n\nالتوصيات:\nإجراءات عملية مرتبطة بالنتائج المتاحة.\n\nإذا كان سؤال المستخدم بسيطًا ومباشرًا، أجب باختصار ولا تفرض هذا الهيكل الكامل.\n\n━━━━━━━━━━━━━━━━━━━━\nاستخدام قاعدة المعرفة بذكاء\n━━━━━━━━━━━━━━━━━━━━\n\nلا تستدعِ Supabase Vector Store لكل سؤال تلقائيًا.\n\nاستخدم بيانات Code in JavaScript وحدها عندما يمكن الإجابة بالكامل من البيانات الحالية.\n\nاستخدم Supabase Vector Store عندما تحتاج:\n- تعريف أو تفسير KPI.\n- قاعدة تحليلية أو معيار.\n- سياق أعمال.\n- أفضل ممارسة.\n- توصية تحتاج معرفة تتجاوز البيانات.\n- معلومة محفوظة في قاعدة المعرفة.\n- أو عندما يطلب المستخدم الرجوع إليها صراحة.\n\nعند دمج المصدرين:\n- بيانات Code = ما حدث فعليًا.\n- قاعدة المعرفة = كيف نفهمه أو نتعامل معه.\nولا تخلط بين الاثنين."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "af68a26c-e0a1-47df-ab0c-cefbf839e44d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "url": "https://bybsfvvqbwkqsnyjwflb.supabase.co/rest/v1/sales_analytics",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "gross_sales,net_sales,discount,return_amount,quantity,unit_price,order_id,customer_id,product_name,category,branch,city,sales_channel,order_date,status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3be96133-a06d-44f7-9ae0-f8ab87d2e50a",
+      "name": "HTTP Request",
+      "credentials": {
+        "supabaseApi": {
+          "id": "VW3QOQ6oIk3JMOQj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ======================================================\n// 1) استقبال جميع السجلات\n// ======================================================\n\nconst data = $input.all().map(item => item.json);\n\nconst num = (v) => Number(v) || 0;\nconst round = (v) => Math.round((v + Number.EPSILON) * 100) / 100;\n\n\n// ======================================================\n// 2) KPIs الأساسية\n// ======================================================\n\nconst totalGrossSales = data.reduce(\n  (sum, r) => sum + num(r.gross_sales), 0\n);\n\nconst totalNetSales = data.reduce(\n  (sum, r) => sum + num(r.net_sales), 0\n);\n\n// الخصومات الفعلية من العمود discount\nconst totalDiscount = data.reduce(\n  (sum, r) => sum + num(r.discount), 0\n);\n\n// المرتجعات الفعلية من العمود return_amount\nconst totalReturns = data.reduce(\n  (sum, r) => sum + num(r.return_amount), 0\n);\n\n// نسبة الخصومات من Gross Sales\nconst discountPercentage =\n  totalGrossSales > 0\n    ? (totalDiscount / totalGrossSales) * 100\n    : 0;\n\n// نسبة المرتجعات من Gross Sales\nconst returnPercentage =\n  totalGrossSales > 0\n    ? (totalReturns / totalGrossSales) * 100\n    : 0;\n\n// إجمالي الخصومات + المرتجعات\nconst totalDeductions =\n  totalDiscount + totalReturns;\n\nconst deductionsPercentage =\n  totalGrossSales > 0\n    ? (totalDeductions / totalGrossSales) * 100\n    : 0;\n\n\n// ======================================================\n// 3) الطلبات والعملاء\n// ======================================================\n\nconst orders = new Set(\n  data\n    .map(r => r.order_id)\n    .filter(v => v != null)\n);\n\nconst customers = new Set(\n  data\n    .map(r => r.customer_id)\n    .filter(v => v != null)\n);\n\nconst averageOrderValue =\n  orders.size > 0\n    ? totalNetSales / orders.size\n    : 0;\n\nconst averageSalesPerCustomer =\n  customers.size > 0\n    ? totalNetSales / customers.size\n    : 0;\n\n\n// ======================================================\n// 4) تحليل المرتجعات العام\n// ======================================================\n\n// عدد البنود التي تحتوي على مرتجع\nconst returnedItemsRows = data.filter(\n  r => num(r.return_amount) > 0\n);\n\nconst returnedItemsCount =\n  returnedItemsRows.length;\n\n// عدد الطلبات التي تحتوي على مرتجع\nconst returnedOrders = new Set(\n  returnedItemsRows\n    .map(r => r.order_id)\n    .filter(v => v != null)\n);\n\nconst returnedOrdersCount =\n  returnedOrders.size;\n\n// نسبة الطلبات التي بها مرتجع\nconst returnedOrdersPercentage =\n  orders.size > 0\n    ? (returnedOrdersCount / orders.size) * 100\n    : 0;\n\n\n// ======================================================\n// 5) دالة تجميع المبيعات\n// ======================================================\n\nfunction groupSales(field) {\n\n  const result = {};\n\n  for (const row of data) {\n\n    const key =\n      row[field] ?? \"Unknown\";\n\n    if (!result[key]) {\n      result[key] = 0;\n    }\n\n    result[key] +=\n      num(row.net_sales);\n  }\n\n  return Object.entries(result)\n    .map(([name, sales]) => ({\n\n      name,\n\n      sales:\n        round(sales),\n\n      contribution_percentage:\n        totalNetSales > 0\n          ? round(\n              (sales / totalNetSales) * 100\n            )\n          : 0\n    }))\n    .sort(\n      (a, b) =>\n        b.sales - a.sales\n    );\n}\n\n\n// ======================================================\n// 6) التجميع الإجمالي\n// ======================================================\n\nconst branchSales =\n  groupSales(\"branch\");\n\nconst productSales =\n  groupSales(\"product_name\");\n\nconst categorySales =\n  groupSales(\"category\");\n\nconst citySales =\n  groupSales(\"city\");\n\nconst channelSales =\n  groupSales(\"sales_channel\");\n\n\n// ======================================================\n// 7) دالة تحليل المرتجعات حسب بُعد\n// ======================================================\n\nfunction groupReturns(field) {\n\n  const result = {};\n\n  for (const row of data) {\n\n    const key =\n      row[field] ?? \"Unknown\";\n\n    if (!result[key]) {\n\n      result[key] = {\n        return_amount: 0,\n        gross_sales: 0,\n        net_sales: 0,\n        returned_orders: new Set()\n      };\n    }\n\n    result[key].return_amount +=\n      num(row.return_amount);\n\n    result[key].gross_sales +=\n      num(row.gross_sales);\n\n    result[key].net_sales +=\n      num(row.net_sales);\n\n    if (\n      num(row.return_amount) > 0 &&\n      row.order_id != null\n    ) {\n      result[key].returned_orders.add(\n        row.order_id\n      );\n    }\n  }\n\n  return Object.entries(result)\n    .map(([name, values]) => ({\n\n      name,\n\n      return_amount:\n        round(values.return_amount),\n\n      return_percentage:\n        values.gross_sales > 0\n          ? round(\n              (\n                values.return_amount /\n                values.gross_sales\n              ) * 100\n            )\n          : 0,\n\n      returned_orders_count:\n        values.returned_orders.size,\n\n      gross_sales:\n        round(values.gross_sales),\n\n      net_sales:\n        round(values.net_sales)\n\n    }))\n    .sort(\n      (a, b) =>\n        b.return_amount -\n        a.return_amount\n    );\n}\n\n\n// ======================================================\n// 8) المرتجعات حسب الأبعاد\n// ======================================================\n\nconst returnsByBranch =\n  groupReturns(\"branch\");\n\nconst returnsByProduct =\n  groupReturns(\"product_name\");\n\nconst returnsByCategory =\n  groupReturns(\"category\");\n\nconst returnsByCity =\n  groupReturns(\"city\");\n\nconst returnsByChannel =\n  groupReturns(\"sales_channel\");\n\n\n// ======================================================\n// 9) المبيعات الشهرية\n// ======================================================\n\nconst monthly = {};\n\nfor (const row of data) {\n\n  if (!row.order_date) continue;\n\n  const month =\n    String(row.order_date).slice(0, 7);\n\n  if (!monthly[month]) {\n\n    monthly[month] = {\n\n      gross_sales: 0,\n\n      discount: 0,\n\n      returns: 0,\n\n      net_sales: 0,\n\n      orders: new Set(),\n\n      returned_orders: new Set()\n    };\n  }\n\n  monthly[month].gross_sales +=\n    num(row.gross_sales);\n\n  monthly[month].discount +=\n    num(row.discount);\n\n  monthly[month].returns +=\n    num(row.return_amount);\n\n  monthly[month].net_sales +=\n    num(row.net_sales);\n\n  if (row.order_id != null) {\n\n    monthly[month].orders.add(\n      row.order_id\n    );\n  }\n\n  if (\n    num(row.return_amount) > 0 &&\n    row.order_id != null\n  ) {\n\n    monthly[month].returned_orders.add(\n      row.order_id\n    );\n  }\n}\n\n\nconst monthlySales =\n  Object.entries(monthly)\n    .map(([month, values]) => ({\n\n      month,\n\n      gross_sales:\n        round(values.gross_sales),\n\n      discount:\n        round(values.discount),\n\n      discount_percentage:\n        values.gross_sales > 0\n          ? round(\n              (\n                values.discount /\n                values.gross_sales\n              ) * 100\n            )\n          : 0,\n\n      returns:\n        round(values.returns),\n\n      return_percentage:\n        values.gross_sales > 0\n          ? round(\n              (\n                values.returns /\n                values.gross_sales\n              ) * 100\n            )\n          : 0,\n\n      net_sales:\n        round(values.net_sales),\n\n      orders_count:\n        values.orders.size,\n\n      returned_orders_count:\n        values.returned_orders.size,\n\n      average_order_value:\n        values.orders.size > 0\n          ? round(\n              values.net_sales /\n              values.orders.size\n            )\n          : 0\n\n    }))\n    .sort(\n      (a, b) =>\n        a.month.localeCompare(b.month)\n    );\n\n\n// ======================================================\n// 10) التجميع الشهري حسب بُعد\n// ======================================================\n\nfunction groupMonthlySales(field) {\n\n  const result = {};\n\n  for (const row of data) {\n\n    if (!row.order_date) continue;\n\n    const month =\n      String(row.order_date)\n        .slice(0, 7);\n\n    const name =\n      row[field] ?? \"Unknown\";\n\n    if (!result[month]) {\n      result[month] = {};\n    }\n\n    if (!result[month][name]) {\n      result[month][name] = 0;\n    }\n\n    result[month][name] +=\n      num(row.net_sales);\n  }\n\n  return Object.entries(result)\n    .sort(\n      ([monthA], [monthB]) =>\n        monthA.localeCompare(monthB)\n    )\n    .map(([month, groups]) => ({\n\n      month,\n\n      items:\n        Object.entries(groups)\n          .map(([name, sales]) => ({\n\n            name,\n\n            sales:\n              round(sales)\n\n          }))\n          .sort(\n            (a, b) =>\n              b.sales - a.sales\n          )\n    }));\n}\n\n\n// ======================================================\n// 11) التجميع الشهري للمبيعات حسب الأبعاد\n// ======================================================\n\nconst monthlySalesByBranch =\n  groupMonthlySales(\"branch\");\n\nconst monthlySalesByProduct =\n  groupMonthlySales(\"product_name\");\n\nconst monthlySalesByCategory =\n  groupMonthlySales(\"category\");\n\nconst monthlySalesByChannel =\n  groupMonthlySales(\"sales_channel\");\n\n\n// ======================================================\n// 12) مقارنة آخر شهرين للمبيعات\n// ======================================================\n\nfunction compareLatestMonths(monthlyGrouped) {\n\n  if (monthlyGrouped.length < 2) {\n    return [];\n  }\n\n  const current =\n    monthlyGrouped[\n      monthlyGrouped.length - 1\n    ];\n\n  const previous =\n    monthlyGrouped[\n      monthlyGrouped.length - 2\n    ];\n\n  const currentMap = {};\n  const previousMap = {};\n\n  for (const item of current.items) {\n    currentMap[item.name] =\n      item.sales;\n  }\n\n  for (const item of previous.items) {\n    previousMap[item.name] =\n      item.sales;\n  }\n\n  const allNames =\n    new Set([\n      ...Object.keys(currentMap),\n      ...Object.keys(previousMap)\n    ]);\n\n  const comparison = [];\n\n  for (const name of allNames) {\n\n    const currentSales =\n      num(currentMap[name]);\n\n    const previousSales =\n      num(previousMap[name]);\n\n    const difference =\n      currentSales -\n      previousSales;\n\n    const growthPercentage =\n      previousSales !== 0\n        ? (\n            difference /\n            previousSales\n          ) * 100\n        : null;\n\n    comparison.push({\n\n      name,\n\n      previous_month:\n        previous.month,\n\n      previous_sales:\n        round(previousSales),\n\n      current_month:\n        current.month,\n\n      current_sales:\n        round(currentSales),\n\n      difference:\n        round(difference),\n\n      growth_percentage:\n        growthPercentage === null\n          ? null\n          : round(growthPercentage),\n\n      trend:\n        difference > 0\n          ? \"Increase\"\n          : difference < 0\n          ? \"Decrease\"\n          : \"No Change\"\n    });\n  }\n\n  return comparison.sort(\n    (a, b) =>\n      b.difference -\n      a.difference\n  );\n}\n\n\nconst latestBranchComparison =\n  compareLatestMonths(\n    monthlySalesByBranch\n  );\n\nconst latestProductComparison =\n  compareLatestMonths(\n    monthlySalesByProduct\n  );\n\nconst latestCategoryComparison =\n  compareLatestMonths(\n    monthlySalesByCategory\n  );\n\nconst latestChannelComparison =\n  compareLatestMonths(\n    monthlySalesByChannel\n  );\n\n\n// ======================================================\n// 13) المرتجعات الشهرية حسب بُعد\n// ======================================================\n\nfunction groupMonthlyReturns(field) {\n\n  const result = {};\n\n  for (const row of data) {\n\n    if (!row.order_date) continue;\n\n    const month =\n      String(row.order_date)\n        .slice(0, 7);\n\n    const name =\n      row[field] ?? \"Unknown\";\n\n    if (!result[month]) {\n      result[month] = {};\n    }\n\n    if (!result[month][name]) {\n\n      result[month][name] = {\n        returns: 0,\n        gross_sales: 0,\n        returned_orders: new Set()\n      };\n    }\n\n    result[month][name].returns +=\n      num(row.return_amount);\n\n    result[month][name].gross_sales +=\n      num(row.gross_sales);\n\n    if (\n      num(row.return_amount) > 0 &&\n      row.order_id != null\n    ) {\n\n      result[month][name]\n        .returned_orders\n        .add(row.order_id);\n    }\n  }\n\n  return Object.entries(result)\n    .sort(\n      ([a], [b]) =>\n        a.localeCompare(b)\n    )\n    .map(([month, groups]) => ({\n\n      month,\n\n      items:\n        Object.entries(groups)\n          .map(([name, values]) => ({\n\n            name,\n\n            return_amount:\n              round(values.returns),\n\n            return_percentage:\n              values.gross_sales > 0\n                ? round(\n                    (\n                      values.returns /\n                      values.gross_sales\n                    ) * 100\n                  )\n                : 0,\n\n            returned_orders_count:\n              values.returned_orders.size\n\n          }))\n          .sort(\n            (a, b) =>\n              b.return_amount -\n              a.return_amount\n          )\n    }));\n}\n\n\n// ======================================================\n// 14) المرتجعات الشهرية حسب الأبعاد\n// ======================================================\n\nconst monthlyReturnsByBranch =\n  groupMonthlyReturns(\"branch\");\n\nconst monthlyReturnsByProduct =\n  groupMonthlyReturns(\"product_name\");\n\nconst monthlyReturnsByCategory =\n  groupMonthlyReturns(\"category\");\n\nconst monthlyReturnsByChannel =\n  groupMonthlyReturns(\"sales_channel\");\n\n\n// ======================================================\n// 15) مقارنة مرتجعات آخر شهرين\n// ======================================================\n\nfunction compareLatestReturns(monthlyGrouped) {\n\n  if (monthlyGrouped.length < 2) {\n    return [];\n  }\n\n  const current =\n    monthlyGrouped[\n      monthlyGrouped.length - 1\n    ];\n\n  const previous =\n    monthlyGrouped[\n      monthlyGrouped.length - 2\n    ];\n\n  const currentMap = {};\n  const previousMap = {};\n\n  for (const item of current.items) {\n    currentMap[item.name] =\n      item.return_amount;\n  }\n\n  for (const item of previous.items) {\n    previousMap[item.name] =\n      item.return_amount;\n  }\n\n  const allNames =\n    new Set([\n      ...Object.keys(currentMap),\n      ...Object.keys(previousMap)\n    ]);\n\n  const result = [];\n\n  for (const name of allNames) {\n\n    const currentReturns =\n      num(currentMap[name]);\n\n    const previousReturns =\n      num(previousMap[name]);\n\n    const difference =\n      currentReturns -\n      previousReturns;\n\n    const growthPercentage =\n      previousReturns !== 0\n        ? (\n            difference /\n            previousReturns\n          ) * 100\n        : null;\n\n    result.push({\n\n      name,\n\n      previous_month:\n        previous.month,\n\n      previous_returns:\n        round(previousReturns),\n\n      current_month:\n        current.month,\n\n      current_returns:\n        round(currentReturns),\n\n      difference:\n        round(difference),\n\n      growth_percentage:\n        growthPercentage === null\n          ? null\n          : round(growthPercentage),\n\n      trend:\n        difference > 0\n          ? \"Increase\"\n          : difference < 0\n          ? \"Decrease\"\n          : \"No Change\"\n    });\n  }\n\n  return result.sort(\n    (a, b) =>\n      b.difference -\n      a.difference\n  );\n}\n\n\nconst latestReturnBranchComparison =\n  compareLatestReturns(\n    monthlyReturnsByBranch\n  );\n\nconst latestReturnProductComparison =\n  compareLatestReturns(\n    monthlyReturnsByProduct\n  );\n\nconst latestReturnCategoryComparison =\n  compareLatestReturns(\n    monthlyReturnsByCategory\n  );\n\nconst latestReturnChannelComparison =\n  compareLatestReturns(\n    monthlyReturnsByChannel\n  );\n\n\n// ======================================================\n// 16) النمو الشهري الإجمالي MoM\n// ======================================================\n\nconst monthlyGrowth =\n  monthlySales.map(\n    (current, index) => {\n\n      if (index === 0) {\n\n        return {\n\n          month:\n            current.month,\n\n          net_sales:\n            current.net_sales,\n\n          previous_month_net_sales:\n            null,\n\n          difference:\n            null,\n\n          growth_percentage:\n            null,\n\n          trend:\n            \"No previous month\"\n        };\n      }\n\n      const previous =\n        monthlySales[index - 1];\n\n      const difference =\n        current.net_sales -\n        previous.net_sales;\n\n      const growth =\n        previous.net_sales !== 0\n          ? (\n              difference /\n              previous.net_sales\n            ) * 100\n          : 0;\n\n      return {\n\n        month:\n          current.month,\n\n        net_sales:\n          current.net_sales,\n\n        previous_month_net_sales:\n          previous.net_sales,\n\n        difference:\n          round(difference),\n\n        growth_percentage:\n          round(growth),\n\n        trend:\n          growth > 0\n            ? \"Increase\"\n            : growth < 0\n            ? \"Decrease\"\n            : \"No Change\"\n      };\n    }\n  );\n\n\n// ======================================================\n// 17) أعلى وأقل شهر\n// ======================================================\n\nconst monthsRanked =\n  [...monthlySales].sort(\n    (a, b) =>\n      b.net_sales -\n      a.net_sales\n  );\n\nconst bestMonth =\n  monthsRanked.length > 0\n    ? monthsRanked[0]\n    : null;\n\nconst worstMonth =\n  monthsRanked.length > 0\n    ? monthsRanked[\n        monthsRanked.length - 1\n      ]\n    : null;\n\n\n// ======================================================\n// 18) Top 5\n// ======================================================\n\nconst top5Products =\n  productSales.slice(0, 5);\n\nconst top5Branches =\n  branchSales.slice(0, 5);\n\nconst top5ReturnProducts =\n  returnsByProduct\n    .filter(\n      x => x.return_amount > 0\n    )\n    .slice(0, 5);\n\nconst top5ReturnBranches =\n  returnsByBranch\n    .filter(\n      x => x.return_amount > 0\n    )\n    .slice(0, 5);\n\nconst top5ReturnCategories =\n  returnsByCategory\n    .filter(\n      x => x.return_amount > 0\n    )\n    .slice(0, 5);\n\n\n// ======================================================\n// 19) أحدث نمو شهري\n// ======================================================\n\nconst latestMonthlyGrowth =\n  monthlyGrowth.length > 1\n    ? monthlyGrowth[\n        monthlyGrowth.length - 1\n      ]\n    : null;\n\n\n// ======================================================\n// 20) نطاق البيانات\n// ======================================================\n\nconst availableMonths =\n  monthlySales.map(\n    m => m.month\n  );\n\nconst firstAvailableMonth =\n  availableMonths.length > 0\n    ? availableMonths[0]\n    : null;\n\nconst latestAvailableMonth =\n  availableMonths.length > 0\n    ? availableMonths[\n        availableMonths.length - 1\n      ]\n    : null;\n\n\n// ======================================================\n// 21) تحليل العملاء\n// ======================================================\n\nconst customerSalesMap = {};\n\nfor (const row of data) {\n\n  if (row.customer_id == null) {\n    continue;\n  }\n\n  const customerId =\n    String(row.customer_id);\n\n  if (!customerSalesMap[customerId]) {\n\n    customerSalesMap[customerId] = {\n\n      customer_id:\n        customerId,\n\n      net_sales:\n        0,\n\n      returns:\n        0,\n\n      orders:\n        new Set()\n    };\n  }\n\n  customerSalesMap[\n    customerId\n  ].net_sales +=\n    num(row.net_sales);\n\n  customerSalesMap[\n    customerId\n  ].returns +=\n    num(row.return_amount);\n\n  if (row.order_id != null) {\n\n    customerSalesMap[\n      customerId\n    ].orders.add(\n      row.order_id\n    );\n  }\n}\n\n\nconst customerSales =\n  Object.values(\n    customerSalesMap\n  )\n    .map(customer => ({\n\n      customer_id:\n        customer.customer_id,\n\n      net_sales:\n        round(\n          customer.net_sales\n        ),\n\n      returns:\n        round(\n          customer.returns\n        ),\n\n      orders_count:\n        customer.orders.size,\n\n      average_order_value:\n        customer.orders.size > 0\n          ? round(\n              customer.net_sales /\n              customer.orders.size\n            )\n          : 0,\n\n      contribution_percentage:\n        totalNetSales > 0\n          ? round(\n              (\n                customer.net_sales /\n                totalNetSales\n              ) * 100\n            )\n          : 0\n\n    }))\n    .sort(\n      (a, b) =>\n        b.net_sales -\n        a.net_sales\n    );\n\n\nconst top5Customers =\n  customerSales.slice(0, 5);\n\n\n// ======================================================\n// 22) المبيعات الأسبوعية\n// الأسبوع يبدأ يوم الاثنين\n// ======================================================\n\nconst weekly = {};\n\nfunction getWeekStart(dateValue) {\n\n  const date =\n    new Date(\n      `${dateValue}T00:00:00Z`\n    );\n\n  if (\n    Number.isNaN(\n      date.getTime()\n    )\n  ) {\n    return null;\n  }\n\n  const day =\n    date.getUTCDay();\n\n  const diffToMonday =\n    day === 0\n      ? -6\n      : 1 - day;\n\n  date.setUTCDate(\n    date.getUTCDate() +\n    diffToMonday\n  );\n\n  return date\n    .toISOString()\n    .slice(0, 10);\n}\n\n\nfor (const row of data) {\n\n  if (!row.order_date) continue;\n\n  const weekStart =\n    getWeekStart(\n      row.order_date\n    );\n\n  if (!weekStart) continue;\n\n  if (!weekly[weekStart]) {\n\n    weekly[weekStart] = {\n\n      gross_sales: 0,\n\n      discount: 0,\n\n      returns: 0,\n\n      net_sales: 0,\n\n      orders: new Set(),\n\n      returned_orders:\n        new Set()\n    };\n  }\n\n  weekly[weekStart]\n    .gross_sales +=\n    num(row.gross_sales);\n\n  weekly[weekStart]\n    .discount +=\n    num(row.discount);\n\n  weekly[weekStart]\n    .returns +=\n    num(row.return_amount);\n\n  weekly[weekStart]\n    .net_sales +=\n    num(row.net_sales);\n\n  if (row.order_id != null) {\n\n    weekly[weekStart]\n      .orders\n      .add(row.order_id);\n  }\n\n  if (\n    num(row.return_amount) > 0 &&\n    row.order_id != null\n  ) {\n\n    weekly[weekStart]\n      .returned_orders\n      .add(row.order_id);\n  }\n}\n\n\nconst weeklySales =\n  Object.entries(weekly)\n    .map(\n      ([weekStart, values]) => ({\n\n        week_start:\n          weekStart,\n\n        gross_sales:\n          round(\n            values.gross_sales\n          ),\n\n        discount:\n          round(\n            values.discount\n          ),\n\n        returns:\n          round(\n            values.returns\n          ),\n\n        net_sales:\n          round(\n            values.net_sales\n          ),\n\n        orders_count:\n          values.orders.size,\n\n        returned_orders_count:\n          values\n            .returned_orders\n            .size,\n\n        average_order_value:\n          values.orders.size > 0\n            ? round(\n                values.net_sales /\n                values.orders.size\n              )\n            : 0\n\n      })\n    )\n    .sort(\n      (a, b) =>\n        a.week_start.localeCompare(\n          b.week_start\n        )\n    );\n\n\n// ======================================================\n// 23) فحص صحة المعادلات\n// ======================================================\n\n// لأن sales_analytics تجعل net_sales = 0 للطلبات الملغاة،\n// يجب استبعاد كامل Gross Sales الخاص بها من الصافي المتوقع.\n// كذلك لا نخصم discount/return_amount للطلبات الملغاة مرة ثانية.\nconst totalCancelledGrossSales = data\n  .filter(\n    r => String(r.status || \"\").toLowerCase() === \"cancelled\"\n  )\n  .reduce(\n    (sum, r) => sum + num(r.gross_sales),\n    0\n  );\n\nconst validDiscounts = data\n  .filter(\n    r => String(r.status || \"\").toLowerCase() !== \"cancelled\"\n  )\n  .reduce(\n    (sum, r) => sum + num(r.discount),\n    0\n  );\n\nconst validReturns = data\n  .filter(\n    r => String(r.status || \"\").toLowerCase() !== \"cancelled\"\n  )\n  .reduce(\n    (sum, r) => sum + num(r.return_amount),\n    0\n  );\n\nconst expectedNetSales =\n  totalGrossSales -\n  totalCancelledGrossSales -\n  validDiscounts -\n  validReturns;\n\nconst reconciliationDifference =\n  round(expectedNetSales - totalNetSales);\n\nconst reconciliationStatus =\n  Math.abs(reconciliationDifference) < 0.01\n    ? \"OK\"\n    : \"CHECK DATA\";\n\n\n// ======================================================\n// 24) النتيجة النهائية\n// ======================================================\n\nreturn [\n  {\n    json: {\n\n      // --------------------------------\n      // نطاق البيانات\n      // --------------------------------\n\n      first_available_month:\n        firstAvailableMonth,\n\n      latest_available_month:\n        latestAvailableMonth,\n\n      available_months:\n        availableMonths,\n\n\n      // --------------------------------\n      // KPIs الأساسية\n      // --------------------------------\n\n      total_gross_sales:\n        round(totalGrossSales),\n\n      total_discount:\n        round(totalDiscount),\n\n      discount_percentage:\n        round(discountPercentage),\n\n      total_returns:\n        round(totalReturns),\n\n      return_percentage:\n        round(returnPercentage),\n\n      total_deductions:\n        round(totalDeductions),\n\n      deductions_percentage:\n        round(deductionsPercentage),\n\n      total_net_sales:\n        round(totalNetSales),\n\n      orders_count:\n        orders.size,\n\n      customers_count:\n        customers.size,\n\n      average_order_value:\n        round(averageOrderValue),\n\n      average_sales_per_customer:\n        round(\n          averageSalesPerCustomer\n        ),\n\n\n      // --------------------------------\n      // KPIs المرتجعات\n      // --------------------------------\n\n      returned_items_rows:\n        returnedItemsCount,\n\n      returned_orders_count:\n        returnedOrdersCount,\n\n      returned_orders_percentage:\n        round(\n          returnedOrdersPercentage\n        ),\n\n\n      // --------------------------------\n      // فحص صحة الأرقام\n      // --------------------------------\n\n      reconciliation: {\n\n        gross_sales:\n          round(totalGrossSales),\n\n        cancelled_gross_sales:\n          round(totalCancelledGrossSales),\n\n        valid_discounts:\n          round(validDiscounts),\n\n        valid_returns:\n          round(validReturns),\n\n        expected_net_sales:\n          round(expectedNetSales),\n\n        actual_net_sales:\n          round(totalNetSales),\n\n        difference:\n          round(reconciliationDifference),\n\n        status:\n          reconciliationStatus\n      },\n\n\n      // --------------------------------\n      // الأفضل\n      // --------------------------------\n\n      top_branch:\n        branchSales[0] || null,\n\n      top_product:\n        productSales[0] || null,\n\n      top_category:\n        categorySales[0] || null,\n\n      top_city:\n        citySales[0] || null,\n\n      top_sales_channel:\n        channelSales[0] || null,\n\n\n      // --------------------------------\n      // الشهور\n      // --------------------------------\n\n      best_month:\n        bestMonth,\n\n      worst_month:\n        worstMonth,\n\n      latest_monthly_growth:\n        latestMonthlyGrowth,\n\n\n      // --------------------------------\n      // Top 5 المبيعات\n      // --------------------------------\n\n      top_5_products:\n        top5Products,\n\n      top_5_branches:\n        top5Branches,\n\n      top_5_customers:\n        top5Customers,\n\n\n      // --------------------------------\n      // Top 5 المرتجعات\n      // --------------------------------\n\n      top_5_return_products:\n        top5ReturnProducts,\n\n      top_5_return_branches:\n        top5ReturnBranches,\n\n      top_5_return_categories:\n        top5ReturnCategories,\n\n\n      // --------------------------------\n      // المبيعات حسب الأبعاد\n      // --------------------------------\n\n      sales_by_branch:\n        branchSales,\n\n      sales_by_city:\n        citySales,\n\n      sales_by_channel:\n        channelSales,\n\n      sales_by_category:\n        categorySales,\n\n      sales_by_product:\n        productSales,\n\n      sales_by_customer:\n        customerSales,\n\n\n      // --------------------------------\n      // المرتجعات حسب الأبعاد\n      // --------------------------------\n\n      returns_by_branch:\n        returnsByBranch,\n\n      returns_by_city:\n        returnsByCity,\n\n      returns_by_channel:\n        returnsByChannel,\n\n      returns_by_category:\n        returnsByCategory,\n\n      returns_by_product:\n        returnsByProduct,\n\n\n      // --------------------------------\n      // التحليل الشهري\n      // --------------------------------\n\n      monthly_sales:\n        monthlySales,\n\n      monthly_growth:\n        monthlyGrowth,\n\n\n      // --------------------------------\n      // التحليل الأسبوعي\n      // --------------------------------\n\n      weekly_sales:\n        weeklySales,\n\n\n      // --------------------------------\n      // المبيعات الشهرية حسب الأبعاد\n      // --------------------------------\n\n      monthly_sales_by_branch:\n        monthlySalesByBranch,\n\n      monthly_sales_by_product:\n        monthlySalesByProduct,\n\n      monthly_sales_by_category:\n        monthlySalesByCategory,\n\n      monthly_sales_by_channel:\n        monthlySalesByChannel,\n\n\n      // --------------------------------\n      // مقارنة آخر شهرين للمبيعات\n      // --------------------------------\n\n      latest_branch_comparison:\n        latestBranchComparison,\n\n      latest_product_comparison:\n        latestProductComparison,\n\n      latest_category_comparison:\n        latestCategoryComparison,\n\n      latest_channel_comparison:\n        latestChannelComparison,\n\n\n      // --------------------------------\n      // المرتجعات الشهرية\n      // --------------------------------\n\n      monthly_returns_by_branch:\n        monthlyReturnsByBranch,\n\n      monthly_returns_by_product:\n        monthlyReturnsByProduct,\n\n      monthly_returns_by_category:\n        monthlyReturnsByCategory,\n\n      monthly_returns_by_channel:\n        monthlyReturnsByChannel,\n\n\n      // --------------------------------\n      // مقارنة مرتجعات آخر شهرين\n      // --------------------------------\n\n      latest_return_branch_comparison:\n        latestReturnBranchComparison,\n\n      latest_return_product_comparison:\n        latestReturnProductComparison,\n\n      latest_return_category_comparison:\n        latestReturnCategoryComparison,\n\n      latest_return_channel_comparison:\n        latestReturnChannelComparison\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1ab6473a-38c8-4bb0-9a55-b07beec9babf",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=lovable-sales-chat"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        480,
+        208
+      ],
+      "id": "dddd4448-8bdb-4f7a-98f1-3486a941d6a8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Search the sales knowledge base for relevant business context, KPI definitions, sales insights, and analysis guidance. Use this tool when additional knowledge is needed to answer the user's sales questions.",
+        "tableName": {
+          "__rl": true,
+          "value": "sales_knowledge",
+          "mode": "list",
+          "cachedResultName": "sales_knowledge"
+        },
+        "options": {
+          "queryName": "match_sales_knowledge"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        192
+      ],
+      "id": "20619193-7bb5-44ba-b9c1-8d7247ba35d9",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "VW3QOQ6oIk3JMOQj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        352
+      ],
+      "id": "f40017a5-c85b-4de0-9db1-39754ec88787",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "94c82fba-7f6f-4b49-bbe2-2ed838e37af6",
+              "name": "report",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        816,
+        0
+      ],
+      "id": "80565254-8c69-4fb4-8764-7eb94f55e2db",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "almadar-sales-ai",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        144
+      ],
+      "id": "63205815-581b-43cd-a16a-842db2021bdb",
+      "name": "Webhook",
+      "webhookId": "9f83ff16-f88b-4216-9086-914f02925ef2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sales-dashboard",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1264,
+        64
+      ],
+      "id": "4c62c355-9d6d-4e8f-919d-17659b8c7e94",
+      "name": "Webhook1",
+      "webhookId": "1dc91a09-44de-4602-83d6-f858929e6c38"
+    },
+    {
+      "parameters": {
+        "url": "https://bybsfvvqbwkqsnyjwflb.supabase.co/rest/v1/sales_analytics",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "gross_sales,net_sales,discount,return_amount,quantity,unit_price,order_id,customer_id,product_name,category,branch,city,sales_channel,order_date,status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1424,
+        64
+      ],
+      "id": "43ffd1e6-f99c-4692-943b-bb539f221a2e",
+      "name": "HTTP Request1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "VW3QOQ6oIk3JMOQj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(item => item.json);\n\n// ---------- Helpers ----------\nconst num = (v) => Number(v) || 0;\n\nconst money = (v) =>\n  Math.round((v + Number.EPSILON) * 100) / 100;\n\n// ---------- Basic KPIs ----------\nconst grossSales = rows.reduce((s, r) => s + num(r.gross_sales), 0);\nconst netSales = rows.reduce((s, r) => s + num(r.net_sales), 0);\nconst totalDiscount = rows.reduce((s, r) => s + num(r.discount), 0);\nconst totalReturns = rows.reduce((s, r) => s + num(r.return_amount), 0);\nconst totalQuantity = rows.reduce((s, r) => s + num(r.quantity), 0);\n\nconst orders = new Set(rows.map(r => r.order_id)).size;\nconst customers = new Set(rows.map(r => r.customer_id)).size;\n\nconst aov = orders ? netSales / orders : 0;\nconst discountRate = grossSales ? (totalDiscount / grossSales) * 100 : 0;\n\n// ---------- Branch Analysis ----------\nconst branchSales = {};\n\nfor (const r of rows) {\n  const branch = r.branch || 'Unknown';\n\n  if (!branchSales[branch]) {\n    branchSales[branch] = 0;\n  }\n\n  branchSales[branch] += num(r.net_sales);\n}\n\nconst branches = Object.entries(branchSales)\n  .map(([branch, sales]) => ({\n    branch,\n    net_sales: money(sales),\n    share_percent: netSales\n      ? money((sales / netSales) * 100)\n      : 0\n  }))\n  .sort((a, b) => b.net_sales - a.net_sales);\n\nconst topBranch = branches[0] || null;\n\n// ---------- Product Analysis ----------\nconst productSales = {};\n\nfor (const r of rows) {\n  const product = r.product_name || 'Unknown';\n\n  if (!productSales[product]) {\n    productSales[product] = 0;\n  }\n\n  productSales[product] += num(r.net_sales);\n}\n\nconst products = Object.entries(productSales)\n  .map(([product, sales]) => ({\n    product,\n    net_sales: money(sales),\n    share_percent: netSales\n      ? money((sales / netSales) * 100)\n      : 0\n  }))\n  .sort((a, b) => b.net_sales - a.net_sales);\n\nconst topProduct = products[0] || null;\n\n// ---------- Monthly Analysis ----------\nconst monthlySales = {};\n\nfor (const r of rows) {\n  if (!r.order_date) continue;\n\n  const month = String(r.order_date).slice(0, 7);\n\n  if (!monthlySales[month]) {\n    monthlySales[month] = 0;\n  }\n\n  monthlySales[month] += num(r.net_sales);\n}\n\nconst months = Object.entries(monthlySales)\n  .map(([month, sales]) => ({\n    month,\n    net_sales: money(sales)\n  }))\n  .sort((a, b) => a.month.localeCompare(b.month));\n\nconst bestMonth =\n  [...months].sort((a, b) => b.net_sales - a.net_sales)[0] || null;\n\n// ---------- Sales Channel Analysis ----------\nconst channelSales = {};\n\nfor (const r of rows) {\n  const channel = r.sales_channel || 'Unknown';\n\n  if (!channelSales[channel]) {\n    channelSales[channel] = 0;\n  }\n\n  channelSales[channel] += num(r.net_sales);\n}\n\nconst channels = Object.entries(channelSales)\n  .map(([channel, sales]) => ({\n    channel,\n    net_sales: money(sales),\n    share_percent: netSales\n      ? money((sales / netSales) * 100)\n      : 0\n  }))\n  .sort((a, b) => b.net_sales - a.net_sales);\n\n// ---------- Return one clean object ----------\nreturn [\n  {\n    json: {\n      kpis: {\n        gross_sales: money(grossSales),\n        net_sales: money(netSales),\n        total_discount: money(totalDiscount),\n        discount_rate: money(discountRate),\n        total_returns: money(totalReturns),\n        total_quantity: totalQuantity,\n        orders,\n        customers,\n        average_order_value: money(aov)\n      },\n\n      top_branch: topBranch,\n      branches,\n\n      top_product: topProduct,\n      top_products: products.slice(0, 10),\n\n      best_month: bestMonth,\n      monthly_sales: months,\n\n      sales_channels: channels,\n\n      data_period: {\n        from: months.length ? months[0].month : null,\n        to: months.length ? months[months.length - 1].month : null\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        64
+      ],
+      "id": "4278507f-27f4-4901-84cc-80464ff39842",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=سؤال المستخدم:\n{{ $('Webhook1').item.json.body.question }}\n\nبيانات المبيعات المحسوبة:\n{{ JSON.stringify($('Code in JavaScript1').item.json) }}\n\nأنت مساعد ذكي متخصص في تحليل بيانات المبيعات.\n\nأجب عن سؤال المستخدم اعتمادًا فقط على بيانات المبيعات الموجودة أعلاه.\n\nقواعد الإجابة:\n- أجب باللغة العربية.\n- اجعل الإجابة مباشرة ومختصرة.\n- نسّق الأرقام باستخدام الفواصل، مثال: 1,439,684.65\n- المبالغ المالية أضف بعدها \"ر.س\".\n- النسب أضف بعدها \"%\".\n- إذا كان السؤال عن عدد، أظهر العدد بدون عملة.\n- إذا كان السؤال عن فرع أو منتج أو شهر، اذكر الاسم مع القيمة المناسبة إن وجدت.\n- لا تشرح طريقة الحساب إلا إذا طلب المستخدم ذلك.\n- لا تخترع أي بيانات غير موجودة.\n- إذا لم تكن الإجابة موجودة في البيانات، قل:\n\"هذه المعلومة غير متوفرة في بيانات المبيعات الحالية.\"",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1872,
+        64
+      ],
+      "id": "b991910a-a415-4a1a-a16f-f48f79fcdf31",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1744,
+        272
+      ],
+      "id": "37ea4caf-f968-4846-bd4b-6e4336568615",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"output\": \"{{ $('AI Agent1').item.json.output }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2240,
+        64
+      ],
+      "id": "d36ac076-7f99-4c1c-9480-aa415c90f918",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "hund87.app.n8n.cloud",
+            "user-agent": "curl/8.18.0",
+            "content-length": "74",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "2a07:8241:fff:1006:0:384:0:2714",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "NL",
+            "cf-ray": "a4112d7c4d61ba7d-AMS",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "http://localhost:8080",
+            "x-forwarded-for": "2a07:8241:fff:1006:0:384:0:2714, 162.159.113.169",
+            "x-forwarded-host": "hund87.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-65-76c8646b4d-q7ff7",
+            "x-is-trusted": "yes",
+            "x-real-ip": "2a07:8241:fff:1006:0:384:0:2714"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message": "ما أفضل فرع من حيث صافي المبيعات؟"
+          },
+          "webhookUrl": "https://hund87.app.n8n.cloud/webhook/almadar-sales-ai",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "158ef5fa-b0cd-43a6-80dc-71da0713fd5a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61b7c23ebd261f775d42728f6eebd730f2945fdaddfa98409c857e5663873d98"
+  },
+  "nodeGroups": [],
+  "id": "dr7e9r6YW24WVM94",
+  "tags": []
+}

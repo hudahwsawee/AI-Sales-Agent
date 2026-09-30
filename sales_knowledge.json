@@ -1,0 +1,158 @@
+{
+  "name": "sales_knowledge",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "97ad7d85-9fe0-4bd4-87a4-b69035d7d35e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "sales_knowledge",
+          "mode": "list",
+          "cachedResultName": "sales_knowledge"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "62fb8979-9a65-41cf-aa1d-d21049905d1b",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "VW3QOQ6oIk3JMOQj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        160
+      ],
+      "id": "e42a69a4-9056-4504-9bb7-c44d5de8f2ea",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        576,
+        160
+      ],
+      "id": "2a65ab65-658a-4e49-9160-83caf29f1fa6",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a73e7308-a53a-4c11-957f-de6e62d714c3",
+              "name": "content",
+              "value": "Sales Analytics Knowledge Base  صافي المبيعات: 1,439,684.65 ريال إجمالي المبيعات قبل الخصم: 1,690,470 ريال إجمالي الخصومات: 250,785.35 ريال نسبة الخصومات: 14.84%  عدد الطلبات: 360 عدد العملاء: 50 متوسط قيمة الطلب: 3,999.12 ريال  أعلى فرع: Dammam المبيعات: 690,016.05 ريال المساهمة من صافي المبيعات: 47.93%  أعلى منتج: Gaming Laptop G5 المبيعات: 169,747.35 ريال المساهمة من صافي المبيعات: 11.79%  أفضل شهر: 2026-01 المبيعات: 507,217.45 ريال  المبيعات الشهرية: 2026-01: 507,217.45 ريال 2026-02: 447,654.50 ريال 2026-03: 484,812.70 ريال  النمو الشهري: من يناير إلى فبراير: -11.74% من فبراير إلى مارس: +8.30%  قنوات البيع: Online: 766,749.35 ريال، بنسبة 53.26% Store: 672,935.30 ريال، بنسبة 46.74%  ملاحظات تحليلية: فرع Dammam يمثل 47.93% من صافي المبيعات، مما يدل على تركّز مرتفع للمبيعات في هذا الفرع. أعلى 5 منتجات حققت 729,121.75 ريال، أي حوالي 50.65% من صافي المبيعات. قناة Online تتفوق على Store من حيث صافي المبيعات. المبيعات انخفضت في فبراير مقارنة بيناير، ثم ارتفعت في مارس بنسبة 8.30%. مبيعات مارس ما زالت أقل من يناير بمقدار 22,404.75 ريال.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b3aef13e-8614-4e02-a9a2-0c2cfa0e0765",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "75256e82-83ad-4b76-8226-93faa9fd0aa2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61b7c23ebd261f775d42728f6eebd730f2945fdaddfa98409c857e5663873d98"
+  },
+  "nodeGroups": [],
+  "id": "9XRJIALgXJURPGMh",
+  "tags": []
+}
